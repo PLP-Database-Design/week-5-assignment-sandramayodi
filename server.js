@@ -6,7 +6,7 @@ const mysql = require('mysql2');
 
 
 // Create MySQL connection
-const db = mysql.createConnection({
+const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
@@ -14,7 +14,7 @@ const db = mysql.createConnection({
 });
 
 // Connect to the database
-db.connect((err) => {
+pool.getConnection((err) => {
   if (err) {
     console.error('Database connection failed:', err);
   } else {
@@ -28,10 +28,50 @@ app.get('/', (req, res) => {
 
 
 // question one
+app.get('/patients', async (req, res) => {
+  try {
+      const result = await pool.query('SELECT patient_id, first_name, last_name, date_of_birth FROM patients');
+      res.json(result.rows);
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+});
+
+// question 2
+
+app.get('/providers', async (req, res) => {
+  try {
+      const result = await pool.query('SELECT first_name, last_name, provider_specialty FROM providers');
+      res.json(result.rows);
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+});
+
+//question 3
+
+app.get('/providers', async (req, res) => {
+  try {
+      const result = await pool.query('SELECT first_name, last_name, provider_specialty FROM providers');
+      res.json(result.rows);
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+});
 
 
+// question 4
 
 
+app.get('/providers/specialty/:specialty', async (req, res) => {
+  const { specialty } = req.params;
+  try {
+      const result = await pool.query('SELECT * FROM providers WHERE provider_specialty = $1', [specialty]);
+      res.json(result.rows);
+  } catch (err) {
+      res.status(500).json({ error: err.message });
+  }
+});
     
   
 
